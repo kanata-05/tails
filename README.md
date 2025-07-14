@@ -6,9 +6,7 @@ built in python with love :3
 ### how to run  
 you need to install, PyQt5 (graphics :3) and pynput (listening to mouse :3):  
 `pip install PyQt5 pynput`  
-  
-also, you need to change the base path in config.py to the installed path (i know this could've been avoided but just go with it :3)  
-  
+    
 # how to interact  
 tails has a builtin routine system, so it'll automatically keep him active,  
 you can also right-click on him to get him to sit, stand or fly,  

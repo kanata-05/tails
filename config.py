@@ -1,8 +1,7 @@
 import os
 
-# anyone whose going to run this, please change this to your directory
-# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-BASE_PATH = os.path.join("C:\\", "users", "dell", "mainplay", "tails")
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 # Asset directories
 PATH_CONFIG = {
