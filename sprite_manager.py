@@ -36,7 +36,7 @@ class SpriteManager:
             anim_type = key.split('_')[0]  # Extract animation type from key
             direction = key.split('_')[1]  # Extract direction from key
             
-            # Special case for "walk" - use "run" directory
+            # Use run for walk
             directory_type = "run" if anim_type == "walk" else anim_type
             
             if directory_type in self.path_config:
@@ -62,14 +62,11 @@ class SpriteManager:
                 print(f"Warning: Frame {file_path} not found")
                 continue
             
-            # Load the pixmap
             pixmap = QPixmap(file_path)
             
-            # Create a transparent canvas
             canvas = QPixmap(self.canvas_size)
             canvas.fill(Qt.transparent)
             
-            # Paint the sprite onto the canvas
             painter = QPainter(canvas)
             x = (self.canvas_size.width() - pixmap.width()) // 2
             y = y_offset_func(self.canvas_size.height(), pixmap.height())
@@ -81,7 +78,6 @@ class SpriteManager:
         return frames
     
     def _get_y_offset_func(self, animation_type):
-        # Treat "walk" the same as "run" for positioning
         if animation_type == "walk":
             animation_type = "run"
             

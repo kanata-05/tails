@@ -114,26 +114,20 @@ class TailsWidget(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
         
-        # Draw the current sprite
         painter.drawPixmap(0, 0, self.current_sprite)
         
-        # Draw speech bubble if needed
         if self.speech_text and self.sprite_manager.get_bubble():
             bubble = self.sprite_manager.get_bubble()
             
-            # Position the bubble above Tails
             bubble_x = (self.width() - bubble.width()) // 2
             bubble_y = -bubble.height()
             
-            # Draw the bubble
             painter.drawPixmap(bubble_x, bubble_y, bubble)
             
-            # Draw the text inside the bubble
             painter.setPen(Qt.black)
             bubble_text_rect = bubble.rect().adjusted(10, 10, -10, -10)
             bubble_text_rect.translate(bubble_x, bubble_y)
             
-            # Render text to a pixmap once for performance if it's long
             if not self.speech_text_pixmap:
                 temp_pixmap = QPixmap(bubble_text_rect.size())
                 temp_pixmap.fill(Qt.transparent)
@@ -152,18 +146,14 @@ class TailsWidget(QWidget):
         painter.end()
     
     def contextMenuEvent(self, event):
-        # Show the context menu
         self.context_menu.exec_(event.globalPos())
         
-        # Prevent default context menu
         event.accept()
     
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
-            # This event will be handled by the mouse listener in the main application
             pass
         else:
-            # Let the event propagate
             super().mousePressEvent(event)
     
     def mouseDoubleClickEvent(self, event):

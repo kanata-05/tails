@@ -1,5 +1,6 @@
 import time
 import math
+import random
 from threading import Lock
 from enum import Enum, auto
 
@@ -22,14 +23,14 @@ class TailsStateMachine:
         self.lock = Lock()
         
         # Position state
-        self.x = screen_width // 2 - canvas_width // 2  # Start in center of taskbar
+        self.x = screen_width // 2 - canvas_width // 2 
         self.y = taskbar_y - canvas_height
         self.taskbar_y = taskbar_y
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
         
         # Animation state
-        self.current_state = "sit"  # Start sitting
+        self.current_state = "sit" 
         self.direction = "R"
         self.frame_index = 0
         
@@ -41,6 +42,10 @@ class TailsStateMachine:
         # Tiredness state (100 = full energy, 0 = tired)
         self.tiredness = 100.0
         self.last_update_time = time.time()
+        
+        self.forced_sit = False 
+        self.idle_time = 0 
+        self.screen_width = screen_width  
     
     def process_event(self, event, **kwargs):
         with self.lock:
@@ -62,21 +67,17 @@ class TailsStateMachine:
                 self.current_state = new_state
                 self.circle_start_time = None
                 
-                # Update direction based on target
                 self.direction = "L" if target_x < self.x else "R"
                 
                 return old_state != self.current_state
             
             elif event == Event.TICK:
-                # Regular update tick
                 dt = kwargs.get('dt', 0)
                 return self._update_state(dt)
             
-            # Let the FSM handle other events based on the current state
             next_state = self._get_next_state(event)
             if next_state != self.current_state:
                 self.current_state = next_state
-                # Reset frame index on state change
                 self.frame_index = 0
                 return True
                 
@@ -85,16 +86,11 @@ class TailsStateMachine:
     def _get_next_state(self, event):
         event_name = event.name.lower()
         
-        # Get the transition rules for the current state
         transitions = STATE_TRANSITIONS.get(self.current_state, {})
         
-        # Get the next state based on the event
         next_state = transitions.get(event_name, transitions.get("default", self.current_state))
         
-        # Handle cases where the next state is a list of options
         if isinstance(next_state, list):
-            # For now, we're just taking the first option
-            # In a more complex implementation, we'd have logic to choose
             next_state = next_state[0]
             
         return next_state
@@ -111,16 +107,13 @@ class TailsStateMachine:
                 self.frame_index = 0
                 state_changed = True
         elif self.current_state == "sit":
-            self.tiredness = min(100, self.tiredness + TIREDNESS_RECOVERY_RATE * (dt / 2.0))
-            # Check if recovered
-            if self.tiredness > RECOVERY_THRESHOLD:
+            self.tiredness = min(100, self.tiredness + (TIREDNESS_RECOVERY_RATE * 0.5) * (dt / 2.0))
+            if self.tiredness > RECOVERY_THRESHOLD and not self.forced_sit:
                 self.current_state = "idle"
                 self.frame_index = 0
                 state_changed = True
         
-        # State-specific behavior
         if self.current_state in ("walk", "fly") and self.target:
-            # Move toward target
             dx = self.target[0] - self.x
             dy = self.target[1] - self.y
             distance = math.hypot(dx, dy)
@@ -144,9 +137,9 @@ class TailsStateMachine:
                     self.frame_index = 0
                     state_changed = True
                 else:
-                    # If target is on the ground, idle else, hover
                     if abs(self.y - (self.taskbar_y - self.canvas_height)) < 5:
                         self.current_state = "idle"
+                        self.y = self.taskbar_y - self.canvas_height
                     else:
                         self.current_state = "hover"
                     self.frame_index = 0
@@ -154,13 +147,11 @@ class TailsStateMachine:
                 self.target = None
         
         elif self.current_state == "circle" and self.circle_start_time:
-            # Perform circling behavior
             elapsed = time.time() - self.circle_start_time
             if elapsed < CIRCLE_DURATION:
                 angle = (elapsed / CIRCLE_DURATION) * 2 * math.pi
                 self.x = self.circle_center[0] + CIRCLE_RADIUS * math.cos(angle)
                 self.y = self.circle_center[1] + CIRCLE_RADIUS * math.sin(angle)
-                # Update direction based on movement
                 self.direction = "L" if math.cos(angle) < 0 else "R"
             else:
                 # Circle complete
@@ -168,29 +159,39 @@ class TailsStateMachine:
                 self.circle_start_time = None
                 state_changed = True
         
-        # Constrain vertical position ONLY for explicitly ground-based states
         if self.current_state in ("walk", "sit", "idle"):
-            self.y = self.taskbar_y - self.canvas_height
+            y_ground = self.taskbar_y - self.canvas_height
+            if abs(self.y - y_ground) < 5:
+                self.y = y_ground
         elif self.current_state == "idle":
-            # Only snap to ground if already on ground (prevents teleport after flying)
             if abs(self.y - (self.taskbar_y - self.canvas_height)) < 5:
                 self.y = self.taskbar_y - self.canvas_height
         
+        # Random walk when idle
+        if self.current_state == "idle":
+            self.idle_time += dt
+            # Every 2-5 seconds, 20% chance to start walking
+            if self.idle_time > random.uniform(2, 5) and random.random() < 0.2:
+                # Pick a random x position within screen bounds
+                new_x = random.randint(0, self.screen_width - self.canvas_width)
+                y_ground = self.taskbar_y - self.canvas_height
+                self.target = (new_x, y_ground)
+                self.current_state = "walk"
+                self.frame_index = 0
+                self.idle_time = 0
+                state_changed = True
+        else:
+            self.idle_time = 0
+
         return state_changed
     
     def get_state(self):
-        """
-        Get the current state information.
-        
-        Returns:
-            dict: Current state information
-        """
         with self.lock:
             display_state = self.current_state
             if self.current_state == "circle":
                 display_state = "fly"
             if self.current_state == "hover":
-                display_state = "idle"  # Use idle animation for hover, or create a hover sprite
+                display_state = "idle"
             return {
                 "state": display_state,
                 "direction": self.direction,

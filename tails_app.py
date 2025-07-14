@@ -41,15 +41,13 @@ class TailsApp:
         
         self.widget = TailsWidget(self.sprite_manager, self.state_machine)
         
-        self.speech_manager = SpeechManager(self.widget) # Pass the widget to SpeechManager
+        self.speech_manager = SpeechManager(self.widget)
 
         # Connect signals
         self.widget.state_changed.connect(self._handle_state_change)
-        self.widget.request_speech_dialog.connect(self._show_speech_dialog) # New connection
-        
+        self.widget.request_speech_dialog.connect(self._show_speech_dialog)        
         self.last_tick_time = time.time()
         
-        # Update the initial sprite
         self.widget.update_sprite()
         self.widget.show()
     
@@ -67,7 +65,6 @@ class TailsApp:
         def on_click(x, y, button, pressed):
             # Only handle right mouse button presses
             if pressed and button == mouse.Button.right:
-                # Calculate target position (center Tails at click point)
                 target_x = x - CANVAS_SIZE_WIDTH // 2
                 target_y = y - CANVAS_SIZE_HEIGHT // 2
                 
@@ -89,12 +86,10 @@ class TailsApp:
         self.widget.update_sprite()
     
     def _state_tick(self):
-        # Calculate time elapsed since last tick
         current_time = time.time()
         dt = current_time - self.last_tick_time
         self.last_tick_time = current_time
         
-        # Process tick event in state machine
         state_changed = self.state_machine.process_event(Event.TICK, dt=dt)
         
         if state_changed:
@@ -104,24 +99,27 @@ class TailsApp:
         current_tails_state = self.state_machine.get_state()["state"]
 
         if state == "sit":
-            # Only allow sitting if not already sitting and not flying/circling
-            if current_tails_state not in ("sit", "fly", "circle"):
-                self.state_machine.process_event(Event.TIRED) # This transitions to "sit"
+            if current_tails_state != "sit":
+                self.state_machine.current_state = "sit"
+                self.state_machine.frame_index = 0
+                self.state_machine.forced_sit = True
         elif state == "idle":
-            # Allow standing if currently sitting
-            if current_tails_state == "sit":
-                self.state_machine.process_event(Event.RECOVERED) # This transitions to "idle"
-            # If in fly or circle, stop flying/circling and go to idle
-            elif current_tails_state in ("fly", "circle"):
-                current_pos = self.state_machine.get_state()["position"]
-                # Setting target to current position will stop movement and transition to idle
-                self.state_machine.process_event(Event.RIGHT_CLICK, x=current_pos[0], y=current_pos[1])
+            if current_tails_state != "idle":
+                # If in air, fly down to ground
+                pos = self.state_machine.get_state()["position"]
+                y_ground = self.state_machine.taskbar_y - self.state_machine.canvas_height
+                if current_tails_state in ("hover", "fly") and abs(pos[1] - y_ground) > 5:
+                    self.state_machine.target = (pos[0], y_ground)
+                    self.state_machine.current_state = "fly"
+                else:
+                    self.state_machine.current_state = "idle"
+                self.state_machine.frame_index = 0
+                self.state_machine.forced_sit = False
         elif state == "fly":
-            # Make Tails fly upward a bit from its current position
             current_state_data = self.state_machine.get_state()
             pos = current_state_data["position"]
             target_x = pos[0]
-            target_y = pos[1] - 200  # Fly upward from current position
+            target_y = pos[1] - 200 
             self.state_machine.process_event(
                 Event.RIGHT_CLICK,
                 x=target_x,
