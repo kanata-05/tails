@@ -1,12 +1,13 @@
 import os
 
 # anyone whose going to run this, please change this to your directory
+# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 BASE_PATH = os.path.join("C:\\", "users", "dell", "mainplay", "tails")
 
 # Asset directories
 PATH_CONFIG = {
     "run": os.path.join(BASE_PATH, "run"),
-    "fly": os.path.join(BASE_PATH, "fly"),
+    "fly": os.path.join(BASE_PATH, "fly"), 
     "idle": os.path.join(BASE_PATH, "idle"),
     "sit": os.path.join(BASE_PATH, "sit"),
     "extras": os.path.join(BASE_PATH, "extras"),
