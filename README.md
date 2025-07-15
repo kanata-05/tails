@@ -2,7 +2,9 @@
 
 tails is a cute little assistant which you can play around with and get help from!  
 built in python with love :3  
-  
+
+![tails on my taskbar](extras/demo.png)  
+
 ### how to run  
 you can find executables for windows in releases tab!!  (linux isn't currently supported as tails uses OS-specific libs, currently working on support for linux)
   
