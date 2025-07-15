@@ -2,13 +2,13 @@ import os
 from PIL import Image 
 
 base_dir = "C:\\users\\dell\\pictures\\"
-input_folder = os.path.join(base_dir, "idle")
-output_folder = os.path.join(base_dir, "idle")
+input_folder = os.path.join(base_dir, "sit")
+output_folder = os.path.join(base_dir, "sit")
 os.makedirs(output_folder, exist_ok=True)
 
-for i in range(1, 9):
-    input_path = os.path.join(input_folder, f"tailsIdle{i}.png")
-    output_path = os.path.join(output_folder, f"tailsIdleB{i}.png")
+for i in range(1, 11):
+    input_path = os.path.join(input_folder, f"tailsSit{i}.png")
+    output_path = os.path.join(output_folder, f"tailsSitB{i}.png")
 
     if not os.path.exists(input_path):
         print(f"Missing: {input_path}")

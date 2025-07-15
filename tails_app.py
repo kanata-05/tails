@@ -18,7 +18,7 @@ class TailsApp:
         self._setup_timers()
         
         self._setup_mouse_listener()
-    
+        
     def _get_screen_info(self):
         screen = QApplication.primaryScreen()
         full_geometry = screen.geometry()

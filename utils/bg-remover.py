@@ -30,8 +30,8 @@ def process_folder(input_folder, output_folder, bg_color=(255,255,255), toleranc
 
     print("Batch background removal complete.")
 
-input_folder = "C:/Users/dell/Pictures/animations/idle"
-output_folder = "C:/Users/dell/Pictures/idle"
+input_folder = "C:/Users/dell/Pictures/animations/sit"
+output_folder = "C:/Users/dell/Pictures/sit"
 bg_color = (250,243,209)
 tolerance = 7
 

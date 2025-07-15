@@ -2,8 +2,8 @@ import os
 from PIL import Image
 
 # Directories
-folders = ['C:\\Users\\dell\\MainPlay\\tails\\run', 'C:\\Users\\dell\\MainPlay\\tails\\idle']
-target_height = 285
+folders = ['C:\\Users\\dell\\MainPlay\\tails\\sit', 'C:\\Users\\dell\\MainPlay\\tails\\sit']
+target_height = 204
 
 def resize_image_keep_aspect(img_path):
     with Image.open(img_path) as img:

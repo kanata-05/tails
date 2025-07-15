@@ -17,7 +17,7 @@ FRAME_COUNTS = {
     "run": 7,
     "fly": 4,
     "idle": 4,
-    "sit": 8,
+    "sit": 10,
 }
 
 # Animation and movement settings

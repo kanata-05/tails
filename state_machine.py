@@ -18,6 +18,7 @@ class Event(Enum):
     CIRCLE_COMPLETE = auto()
     TICK = auto()  # Regular timer tick
 
+
 class TailsStateMachine:
     def __init__(self, screen_width, taskbar_y, canvas_width, canvas_height):
         self.lock = Lock()

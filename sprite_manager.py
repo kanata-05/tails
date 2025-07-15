@@ -47,7 +47,6 @@ class SpriteManager:
                     self._get_y_offset_func(directory_type)
                 )
         
-        # Load speech bubble
         if "extras" in self.path_config:
             bubble_path = os.path.join(self.path_config["extras"], SPRITE_CONFIG["bubble"])
             if os.path.exists(bubble_path):
@@ -91,17 +90,16 @@ class SpriteManager:
         
         if key not in self.sprites:
             print(f"Warning: Sprite set {key} not found")
-            # Return an empty transparent pixmap as fallback
             fallback = QPixmap(self.canvas_size)
             fallback.fill(Qt.transparent)
             return fallback
         
         frames = self.sprites[key]
         
-        # Special case for sitting animation after first loop
         if state == "sit" and frame_index >= len(frames):
-            # After the first complete loop, only use frames 2-7 for sitting
-            frame_index = (frame_index % (len(frames) - 2)) + 2
+            # After the first complete loop, only use frames 5-10 for sitting
+            # (indexes 4 to 9)
+            frame_index = ((frame_index - 4) % 6) + 4
         else:
             frame_index = frame_index % len(frames)
         
