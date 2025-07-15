@@ -23,7 +23,7 @@ i'll be adding chatting soon so you can make him an assistant.
 - add mobile support :3
 
 ### current issues
-- snaps back to ground randomly while flying 
+- none! :3
 
 ### credits
 all tails sprites have been taken from teamhedgehog,
