@@ -44,14 +44,7 @@ class AssetValidator:
         missing_files = []
         
         # Check each directory
-        for state, directory in path_config.items():
-            if state == "extras":
-                # Check for bubble.png
-                bubble_path = os.path.join(directory, "bubble.png")
-                if not os.path.exists(bubble_path):
-                    missing_files.append(bubble_path)
-                continue
-                
+        for state, directory in path_config.items():                
             # Skip if not a state directory
             if state not in ("run", "fly", "idle", "sit"):
                 continue

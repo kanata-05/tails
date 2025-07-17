@@ -9,7 +9,6 @@ class SpriteManager:
         self.path_config = path_config
         self.canvas_size = canvas_size
         self.sprites = {}
-        self.bubble = None
         
         # Define frame file mappings based on actual filenames
         self.frame_mappings = {
@@ -46,11 +45,6 @@ class SpriteManager:
                     frame_files,
                     self._get_y_offset_func(directory_type)
                 )
-        
-        if "extras" in self.path_config:
-            bubble_path = os.path.join(self.path_config["extras"], SPRITE_CONFIG["bubble"])
-            if os.path.exists(bubble_path):
-                self.bubble = QPixmap(bubble_path)
     
     def _load_frames_from_list(self, directory, frame_files, y_offset_func):
         frames = []
@@ -105,5 +99,3 @@ class SpriteManager:
         
         return frames[frame_index]
     
-    def get_bubble(self):
-        return self.bubble
