@@ -9,8 +9,8 @@ built in python with love :3
 you can find executables for windows in releases tab!!  (linux isn't currently supported as tails uses OS-specific libs, currently working on support for linux)
   
 OR, if you're running source code,  
-you'll need to install, PyQt5 (graphics :3) and pynput (listening to mouse :3):  
-`pip install PyQt5 pynput`  
+you'll need to install, PyQt5 (graphics :3), pynput (listening to mouse :3), google (gemini :3), pyttsx3 (tails speech :3):  
+`pip install pyttsx3 PyQt5 pynput google`  
 and then run `main.py`!  
     
 ### how to interact  
@@ -40,6 +40,7 @@ tails can:
 
 ### current issues
 - tails's speech only works once, I'll be switching over to another lib anyways
+- font doesn't work
 if you find any other issues, please open an issue in the issues tab!
 
 ### credits
