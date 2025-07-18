@@ -40,7 +40,7 @@ tails can:
 
 ### current issues
 - tails's speech only works once, I'll be switching over to another lib anyways
-- font doesn't work
+- font doesn't work  
 if you find any other issues, please open an issue in the issues tab!
 
 ### credits

@@ -2,8 +2,6 @@ import math
 from PyQt5.QtWidgets import QWidget, QMenu, QAction, QInputDialog, QLineEdit 
 from PyQt5.QtCore import Qt, QTimer, QSize, pyqtSignal
 from PyQt5.QtGui import QPainter, QPixmap, QFontMetrics
-import gemini_manager as gem
-
 from state_machine import Event
 
 class TailsWidget(QWidget):
@@ -21,13 +19,11 @@ class TailsWidget(QWidget):
         self._setup_context_menu()
     
     def _setup_widget(self):
-        # Set window flags for frameless, always-on-top behavior
         self.setWindowFlags(
             Qt.FramelessWindowHint | 
             Qt.WindowStaysOnTopHint | 
             Qt.Tool
         )
-        # Enable transparent background
         self.setAttribute(Qt.WA_TranslucentBackground)
     
     def _setup_context_menu(self):

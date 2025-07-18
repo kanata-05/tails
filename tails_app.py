@@ -41,7 +41,7 @@ class TailsApp(QWidget):
             CANVAS_SIZE_HEIGHT
         )
 
-        self.gemini_manager_instance = GeminiManager()
+        self.gemini_manager_instance = GeminiManager(self.state_machine)
 
         self.widget = TailsWidget(self.sprite_manager, self.state_machine, self.gemini_manager_instance)
 

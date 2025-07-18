@@ -2,6 +2,18 @@ import time
 import os
 import math
 
+def log(message, level="INFO"):
+    log_file = "log.txt"
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] [{level}] {message}\n"
+    try:
+        print(log_entry)
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(log_entry)
+    except Exception as e:
+        print(f"Error writing to log file: {e}")
+        print(log_entry.strip())
+
 class FPSCounter:
     def __init__(self, window_size=30):
         self.frame_times = []
