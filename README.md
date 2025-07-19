@@ -9,8 +9,8 @@ built in python with love :3
 you can find executables for windows in releases tab!!  (linux isn't currently supported as tails uses OS-specific libs, currently working on support for linux)
   
 OR, if you're running source code,  
-you'll need to install, PyQt5 (graphics :3), pynput (listening to mouse :3), google (gemini :3), pyttsx3 (tails speech :3):  
-`pip install pyttsx3 PyQt5 pynput google`  
+you'll need to install, PyQt5 (graphics :3), pynput (listening to mouse :3), google (gemini :3):  
+`pip install PyQt5 pynput google`  
 and then run `main.py`!  
     
 ### how to interact  
@@ -22,10 +22,9 @@ you can:
 - **right-click** somewhere on the screen, he'll either fly or walk there
 
 **chatting**:  
-tails now has chatting support! he uses gemini 2.5 flash as his llm.  
-you can right-click tails and click "Talk", it'll prompt you for an gemini API key, [get a free gemini api key](https://aistudio.google.com/apikey)  
-after that, you'll need to open the console (the black window that's open), that's where tails talks to you, (i'll change that soon),  
-you can talk through the beige window, and tails will reply right back in the black window.  (type exit or quit to exit the chat)
+tails now has chatting support! he uses gemini 2.5 flash as his llm (however it's limited, can't remember anything).  
+you can right-click tails and click "Talk", it'll prompt you for an gemini API key, [get a free gemini api key](https://aistudio.google.com/apikey)
+i've implemented speech bubbles and text inputs (type exit or quit to exit the chat)
 
 tails can:  
 - implement the code it generates in your existing code inside your file  
@@ -39,8 +38,7 @@ tails can:
 - add mobile support :3
 
 ### current issues
-- tails's speech only works once, I'll be switching over to another lib anyways
-- font doesn't work  
+- Scrolling in speech bubbles doesn't work :3
 if you find any other issues, please open an issue in the issues tab!
 
 ### credits

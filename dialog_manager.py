@@ -2,7 +2,7 @@ import os
 import platform
 import subprocess
 import tempfile
-from PyQt5.QtWidgets import QApplication, QLineEdit, QVBoxLayout, QPushButton, QDialog, QHBoxLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QApplication, QLineEdit, QVBoxLayout, QPushButton, QDialog, QHBoxLayout, QLabel, QWidget, QTextEdit
 from PyQt5.QtGui import QColor, QPalette, QFont, QFontDatabase, QPainter, QPainterPath
 from PyQt5.QtCore import Qt, QPoint, QRectF, QTimer
 from utils import log
@@ -11,10 +11,10 @@ class DialogManager:
     def __init__(self, tails_state_machine=None, gemini_manager=None):
         self.tails_state_machine = tails_state_machine
         self.active_speech_bubble = None
-        self.speech_bubble_hide_timer = QTimer()
-        self.speech_bubble_hide_timer.setSingleShot(True)
-        self.speech_bubble_hide_timer.timeout.connect(self._hide_speech_bubble)
         self.gemini_manager = gemini_manager
+
+        self.speech_bubble_follow_timer = QTimer()
+        self.speech_bubble_follow_timer.timeout.connect(self.update_speech_bubble)
 
     def _get_tails_position(self):
         if self.tails_state_machine:
@@ -93,7 +93,7 @@ class DialogManager:
             )
             button.clicked.connect(lambda checked, text=option_text: on_button_clicked(text))
             options_layout.addWidget(button)
-        
+
         main_layout.addLayout(options_layout)
 
         # Dialog Styles
@@ -137,7 +137,7 @@ class DialogManager:
         dialog.setAutoFillBackground(True)
 
         input_field = QLineEdit(dialog)
-        
+
         # Fonts
         font_id = QFontDatabase.addApplicationFont(os.path.join(os.path.dirname(os.path.abspath(__file__)), "font", "NationalPark-SemiBold.ttf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0] if font_id != -1 else "Arial"
@@ -216,33 +216,85 @@ class DialogManager:
 
     def _hide_speech_bubble(self):
         if self.active_speech_bubble:
-            self.active_speech_bubble.close()
-            self.active_speech_bubble.deleteLater()
-            self.active_speech_bubble = None
+            self.speech_bubble_follow_timer.stop()
+            self.active_speech_bubble.hide()
             log("Speech bubble hidden.", level="INFO")
 
-    def show_speech_bubble(self, text, bubble_width=300, bubble_height=100, auto_hide_ms=7000):
+    def show_speech_bubble(self, text, bubble_width=300, bubble_height=100):
         self._hide_speech_bubble()
 
         tails_x, tails_y = self._get_tails_position()
         bubble_dialog = QDialog()
         bubble_dialog.setWindowFlags(
-            Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool
+            Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
         )
         bubble_dialog.setAttribute(Qt.WA_TranslucentBackground)
         bubble_dialog.setFixedSize(bubble_width, bubble_height)
 
-        text_label = QLabel(text)
+        text_edit = QTextEdit()
+        text_edit.setPlainText(text)
+        text_edit.setReadOnly(True)
+        text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        text_edit.setFocusPolicy(Qt.NoFocus)
+
+        text_edit.setStyleSheet("""
+            QTextEdit {
+                color: #876156;
+                background-color: transparent;
+                border: none;
+            }
+            QScrollBar:vertical {
+                border: 1px solid #999;
+                background: #e6ccb1;
+                width: 10px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: #876156;
+                min-height: 20px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+                background: none;
+            }
+            QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+                width: 0px;
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+            QScrollBar:horizontal {
+                border: 1px solid #999;
+                background: #e6ccb1;
+                height: 10px;
+                margin: 0px;
+            }
+            QScrollBar::handle:horizontal {
+                background: #876156;
+                min-width: 20px;
+            }
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+                width: 0px;
+                background: none;
+            }
+            QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+                width: 0px;
+                height: 0px;
+            }
+            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+                background: none;
+            }
+        """)
+
         font_id = QFontDatabase.addApplicationFont(os.path.join(os.path.dirname(os.path.abspath(__file__)), "font", "NationalPark-SemiBold.ttf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0] if font_id != -1 else "Arial"
-        text_label.setFont(QFont(font_family, 10))
-        text_label.setStyleSheet("color: #876156;")
-        text_label.setWordWrap(True)
-        text_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        text_edit.setFont(QFont(font_family, 10))
 
         main_layout = QVBoxLayout(bubble_dialog)
         main_layout.setContentsMargins(15, 15, 15, 25)
-        main_layout.addWidget(text_label)
+        main_layout.addWidget(text_edit)
 
         def paint_bubble_event(event):
             painter = QPainter(bubble_dialog)
@@ -306,7 +358,9 @@ class DialogManager:
         self.active_speech_bubble = bubble_dialog
         bubble_dialog.show()
 
-        self.speech_bubble_hide_timer.start(auto_hide_ms)
+        # Removed the hide timer start
+        # Start the follow timer (e.g., update every 50ms for smooth movement)
+        self.speech_bubble_follow_timer.start(50)
 
     def update_speech_bubble(self):
         if self.active_speech_bubble:

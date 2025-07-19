@@ -14,6 +14,7 @@ import threading
 
 class GeminiManager(QObject):
     show_speech_bubble_signal = pyqtSignal(str, int, int, int)
+    hide_speech_bubble_signal = pyqtSignal()
     handle_code_request_signal = pyqtSignal(str)
     set_api_key_signal = pyqtSignal()
     get_user_input_signal = pyqtSignal(str, str, bool)
@@ -27,8 +28,9 @@ class GeminiManager(QObject):
         self.dialog_manager = DialogManager(tails_state_machine=self.tails_state_machine, gemini_manager=self)
 
         self.show_speech_bubble_signal.connect(self.dialog_manager.show_speech_bubble)
+        self.hide_speech_bubble_signal.connect(self.dialog_manager._hide_speech_bubble)
         self.handle_code_request_signal.connect(self.dialog_manager._handle_code)
-        self.set_api_key_signal.connect(self._set_api_key)
+        self.set_api_key_signal.connect(self.set_api_key)
 
         self.tails_prompt = """
         You're now Tails (Miles "Tails" Prower), from sonic the hedgehog, you're a desktop assistant and are to attempt to help the user in any way they need. Your personality must match that of tails.
@@ -163,6 +165,7 @@ class GeminiManager(QObject):
                 )
                 greeting = response.text.strip()
                 log(f"Tails: {greeting}", level="INFO")
+                # Show initial greeting bubble, which will auto-hide
                 self.show_speech_bubble_signal.emit(greeting, 300, 100, 7000)
             else:
                 log("Gemini client is not available. Cannot start chat.", level="ERROR")
@@ -176,16 +179,19 @@ class GeminiManager(QObject):
         while True:
             try:
                 user_input = self.dialog_manager.get_user_input(title="Your Turn", placeholder_text="Type your message here...")
+
                 if user_input is None:
                     log("User cancelled chat input. Exiting chat loop.", level="INFO")
                     farewell = "See ya next time!"
                     log(f"Tails: {farewell}", level="INFO")
-                    self.show_speech_bubble_signal.emit(farewell, 300, 100, 7000)
+                    self.show_speech_bubble_signal.emit(farewell, 300, 100)
+                    self.hide_speech_bubble_signal.emit()
                     break
                 elif user_input.lower() in ["exit", "quit"]:
                     farewell = "bye!"
                     log(f"Tails: {farewell}", level="INFO")
-                    self.show_speech_bubble_signal.emit(farewell, 300, 100, 7000)
+                    self.show_speech_bubble_signal.emit(farewell, 300, 100)
+                    self.hide_speech_bubble_signal.emit()
                     break
 
                 log(f"You: {user_input}", level="INFO")

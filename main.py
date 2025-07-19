@@ -35,9 +35,11 @@ if __name__ == "__main__":
     if not app:
         app = QApplication(sys.argv)
 
-    tails = TailsApp(PATH_CONFIG)
-    print("This is the console for Tails, do not close this.")
-
+    try:
+        tails = TailsApp(PATH_CONFIG)
+        print("This is the console for Tails, do not close this.")
+    except Exception as e:
+        print(e)
     try:
         sys.exit(app.exec_())
     except Exception as e:
